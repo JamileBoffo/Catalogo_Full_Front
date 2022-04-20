@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>NetFlix</title>
+  </head>
+
+  <body>
+    <section class="Home">
+      <header class="Home__header Header">
+        <div class="row">
+          <div class="Header__logo Logo">
+            <img
+              src="./assets/img/Logo.png"
+              width="70px"
+              alt="Logo-NetFlix"
+              class="Logo__icone"
+            />
+          </div>
+          <section class="button-modal-create">
+            <button type="button" class="default-button" onclick="abrirModal()">
+              Criar Filme
+            </button>
+          </section>
+          </div>
+        </div>
+      </header>
+
+      <section class="modal-overlay" id="overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 id="title-header-modal">Cadastrar um Filme</h2>
+            <a onclick="fecharModal()" class="close-modal">X</a>
+          </div>
+
+          <div class="modal-body">
+            <form>
+              <input type="hidden" id="id" />
+              <input type="text" id="titulo" placeholder="Titulo do Filme" />
+              <input type="text" id="ano" placeholder="Ano de Estreia" />
+              <textarea
+                type="text"
+                id="sinopse"
+                placeholder="Sinopse do Filme"
+                rows="5"
+              ></textarea>
+              <input type="text" id="img" placeholder="Link da Foto do Filme" />
+              <button
+                id="button-form-modal"
+                type="submit"
+                onclick="createMovie()"
+              >
+                Cadastrar
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="modal-overlay" id="overlay-delete">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 id="title-header-modal">Confirmação de exclusão</h2>
+            <a onclick="fecharModalDelete()" class="close-modal">X</a>
+          </div>
+          <div class="modal-body-delete">
+            <p>Deseja realmente apagar esse filme?</p>
+            <div class="btns_delete">
+              <button
+                class="btn_delete_no btn_delete"
+                onclick="fecharModalDelete()"
+              >
+                Não
+              </button>
+              <button class="btn_delete_yes btn_delete">Sim</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2>Pesquisar Filme</h2>
+      <div class="movie-escolhido-espaco">
+        <div id="movie-escolhido-input-espaco">
+          <input
+            type="number"
+            id="idMovie"
+            placeholder="Digite o ID do filme"
+          />
+          <button class="default-button" onclick="findByIdMovie()">
+            ESCOLHER
+          </button>
+        </div>
+        <div id="movieEscolhido"></div>
+      </div>
+
+      <h2>Filmes Disponíveis:</h2>
+      <div class="Home__container">
+        <div class="movieLista" id="movieList"></div>
+      </div>
+    </section>
+  </body>
+
+  <script src="script.js"></script>
+</html>
