@@ -1,4 +1,5 @@
 const baseURL = "http://localhost:3000/movies";
+const msgAlert = document.querySelector('.msg-alert');
 
 //READ
 async function findAllMovies() {
@@ -10,7 +11,7 @@ async function findAllMovies() {
     document.getElementById("movieList").insertAdjacentHTML(
       "beforeend",
       `
-      <div class="MovieListaItem" id="MovieListaItem_${movie.id}">
+      <div class="MovieListaItem" id="MovieListaItem_${movie._id}">
         <div>
           <img class="MovieListaItem__img" src="${movie.img}" alt="${movie.titulo}" />
             <div class="MovieListaItem__titulo">${movie.titulo}</div>
@@ -18,8 +19,8 @@ async function findAllMovies() {
             <div class="MovieListaItem__sinopse">${movie.sinopse}</div>
             
             <div class="MovieListaItem__acoes Acoes">
-              <button class="Acoes__editar btn" onclick="abrirModal(${movie.id})">Editar</button> 
-              <button class="Acoes__apagar btn" onclick="abrirModalDelete(${movie.id})">Apagar</button>  
+              <button class="Acoes__editar btn" onclick="abrirModal('${movie._id}')">Editar</button> 
+              <button class="Acoes__apagar btn" onclick="abrirModalDelete('${movie._id}')">Apagar</button>  
             </div>
         </div>
         
@@ -29,36 +30,55 @@ async function findAllMovies() {
   });
 }
 
+findAllMovies();
+
 async function findByIdMovie() {
   const id = document.querySelector("#idMovie").value;
 
+  if(id == "") {
+    localStorage.setItem('message', "Digite um ID para pesquisar!");
+    localStorage.setItem('type', 'danger');
+    showMessageAlert();
+    return;
+  }
+
+
+  document.querySelector('.movieLista').style.display = 'none';
+
   const response = await fetch(`${baseURL}/movie/${id}`);
+
   const movie = await response.json();
 
+  if (movie.message != undefined) {
+    localStorage.setItem('message', movie.message);
+    localStorage.setItem('type', 'danger');
+    showMessageAlert();
+    return;
+  }
+  document.querySelector('.list-all').style.display = 'block'; 
+  document.querySelector('.movieLista').style.display = 'none';
   const movieEscolhidoDiv = document.querySelector("#movieEscolhido");
 
   movieEscolhidoDiv.innerHTML = `
-  <div class="MovieCardItem" id="MovieListaItem_${movie.id}">
+  <div class="MovieCardItem" id="MovieListaItem_${movie._id}">
     <div>
       <img class="MovieCardItem__img" src="${movie.img}" alt="${movie.titulo}" />
       <div class="MovieCardItem__titulo">${movie.titulo}</div>
-      <div class="MovieCardItem__ano">R$ ${movie.ano}</div>
+      <div class="MovieCardItem__ano">${movie.ano}</div>
       <div class="MovieCardItem__sinopse">${movie.sinopse}</div>
 
       <div class="MovieListaItem__acoes Acoes">
-      <button class="Acoes__editar btn" onclick="abrirModal(${movie.id})">Editar</button> 
-      <button class="Acoes__apagar btn" onclick="abrirModalDelete(${movie.id})">Apagar</button>   
+      <button class="Acoes__editar btn" onclick="abrirModal('${movie._id}')">Editar</button> 
+      <button class="Acoes__apagar btn" onclick="abrirModalDelete('${movie._id}')">Apagar</button>   
       </div>
     </div>
     
   </div>`;
 }
 
-findAllMovies();
-
 //CREATE
-async function abrirModal(id = null) {
-  if (id != null) {
+async function abrirModal(id = "") {
+  if (id != "") {
     
     document.querySelector("#title-header-modal").innerText =
       "Atualizar um Filme";
@@ -72,7 +92,7 @@ async function abrirModal(id = null) {
     document.querySelector("#ano").value = movie.ano;
     document.querySelector("#sinopse").value = movie.sinopse;
     document.querySelector("#img").value = movie.img;
-    document.querySelector("#id").value = movie.id;
+    document.querySelector("#id").value = movie._id;
   } else {
     document.querySelector("#title-header-modal").innerText =
       "Cadastrar um Filme";
@@ -93,7 +113,7 @@ function fecharModal() {
 
 //UPDATE
 
-async function createMovie() {
+async function submitMovie() {
   const id = document.querySelector("#id").value;
   const titulo = document.querySelector("#titulo").value;
   const ano = document.querySelector("#ano").value;
@@ -108,7 +128,7 @@ async function createMovie() {
     img,
   };
 
-  const modoEdicaoAtivado = id > 0;
+  const modoEdicaoAtivado = id != "";
 
   const endpoint = baseURL + (modoEdicaoAtivado ? `/update/${id}` : "/create");
 
@@ -123,26 +143,23 @@ async function createMovie() {
 
   const novoMovie = await response.json();
 
-  const html = `
-  <div class="MovieListaItem" id="MovieListaItem_${novoMovie.id}">
-    <div>
-      <div class="MovieListaItem__titulo">${novoMovie.titulo}</div>
-      <div class="MovieListaItem__ano">R$ ${novoMovie.ano}</div>
-      <div class="MovieListaItem__sinopse">${novoMovie.sinopse}</div>
-      <div class="MovieListaItem__acoes Acoes">
-        <button class="Acoes__editar btn" onclick="abrirModal(${movie.id})">Editar</button> 
-        <button class="Acoes__apagar btn" onclick="abrirModalDelete(${movie.id})">Apagar</button>  
-      </div>
-    </div>
-    <img class="MovieListaItem__img" src="${novoMovie.img}" alt="${novoMovie.titulo}"/>
-  </div>`;
-
-  if (modoEdicaoAtivado) {
-    document.querySelector(`MovieListaItem_${id}`).outerHTML = html;
-  } else {
-    document.querySelector("#movieList").insertAdjacentHTML("beforeend", html);
+  if(novoMovie.message != undefined) {
+    localStorage.setItem('message', novoMovie.message);
+    localStorage.setItem('type', 'danger');
+    showMessageAlert();
+    return;
   }
 
+  if(modoEdicaoAtivado) {
+    localStorage.setItem('message', 'Filme atualizado com sucesso!');
+    localStorage.setItem('type', 'success');
+  } else{
+    localStorage.setItem('message', 'Filme criado com sucesso!');
+    localStorage.setItem('type', 'success');
+  }
+
+  document.location.reload(true);
+  
   fecharModal();
 }
 
@@ -171,8 +188,29 @@ async function deleteMovie(id) {
   });
 
   const result = await response.json();
-  alert(result.message);
-  fecharModalDelete();
+  
+  localStorage.setItem('message', result.message);
+  localStorage.setItem('type', 'success');
 
   document.location.reload(true);
+
+  fecharModalDelete();
 }
+
+function showMessageAlert () {
+  msgAlert.innerText = localStorage.getItem('message');
+  msgAlert.classList.add(localStorage.getItem('type'));
+  closeMessageAlert();
+}
+
+
+
+function closeMessageAlert () {
+  setTimeout(function() {
+    msgAlert.innerText = "";
+    msgAlert.classList.remove(localStorage.getItem('type'));
+    localStorage.clear();
+  }, 3000);
+}
+
+showMessageAlert();
