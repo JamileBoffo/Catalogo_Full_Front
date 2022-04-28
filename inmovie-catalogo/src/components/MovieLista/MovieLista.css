@@ -1,0 +1,18 @@
+.MovieLista {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 25px 50px;
+}
+
+@media (max-width: 1220px) {
+  .MovieLista {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 840px) {
+  .MovieLista {
+    grid-template-columns: 1fr;
+  }
+}
+
